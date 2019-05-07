@@ -21,6 +21,12 @@ function render() {
   context.putImageData(imageData, 0, 0);
 }
 
+function clear() {
+  for (let i = 0; i < imageData.data.length; i++) {
+    imageData.data[i] = 255;
+  }
+}
+
 function setPixel(x, y, isBlack) {
   const offset = (x + y * w) * 4;
   const color = isBlack ? 0 : 255;
@@ -33,12 +39,11 @@ function setPixel(x, y, isBlack) {
 const { round } = Math;
 /* x -> y -> isBlack */
 const halfH = round(h / 2);
-const states: number[][] = [[]];
-states[0][halfH] = 1;
+let states: number[][];
 setPixel(0, halfH, 1);
-let x = 0;
-let startY = halfH;
-let endY = halfH;
+let x: number;
+let startY: number;
+let endY: number;
 
 /* -1 -> 0 -> 1 -> result */
 const rules: number[][][] = [];
@@ -67,7 +72,13 @@ function getResult(x, y) {
   return rules[r1][r2][r3];
 }
 
-const isStop = false;
+let isStop = true;
+let domStop = window.stop;
+
+function stop() {
+  isStop = true;
+  domStop();
+}
 
 function update() {
   x++;
@@ -93,4 +104,22 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-loop();
+function start() {
+  states = [[]];
+  states[0][halfH] = 1;
+  x = 0;
+  startY = halfH;
+  endY = halfH;
+  clear();
+  setPixel(0, halfH, 1);
+  isStop = false;
+  loop();
+}
+
+function resume() {
+  isStop = false;
+  loop();
+}
+
+Object.assign(window, { start, resume, stop });
+start();
