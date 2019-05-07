@@ -18,6 +18,8 @@
     "postformat": "tslint -p . --fix",
     "prebuild": "npm run clean",
     "build": "tsc",
+    "prerelease": "rimraf dist && parcel build src/index.html",
+    "release": "surge dist rule-30.surge.sh",
     "pretest": "npm run format && npm run build",
     "rawtest": "ts-node test/index.ts",
     "prepublishOnly": "npm run rawtest && npm run build"
