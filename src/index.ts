@@ -73,6 +73,7 @@ function getResult(x, y) {
 }
 
 let isStop = true;
+let isStopNext = false;
 let domStop = window.stop;
 
 function stop() {
@@ -86,6 +87,10 @@ function update() {
   endY++;
   states.push([]);
   const screenX = x % w;
+  if (isStopNext && screenX === 0) {
+    isStop = true;
+    return;
+  }
   for (let y = startY; y <= endY; y++) {
     const isBlack = getResult(x, y);
     states[x][y] = isBlack;
@@ -113,13 +118,28 @@ function start() {
   clear();
   setPixel(0, halfH, 1);
   isStop = false;
+  isStopNext = false;
   loop();
 }
 
 function resume() {
   isStop = false;
+  isStopNext = false;
   loop();
 }
 
-Object.assign(window, { start, resume, stop });
+function stopNext() {
+  isStopNext = true;
+}
+
+Object.assign(window, { start, resume, stop, stopNext });
+
+canvas.onclick = () => {
+  if (isStop) {
+    resume();
+  } else {
+    stop();
+  }
+};
+
 start();
